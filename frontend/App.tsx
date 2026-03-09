@@ -20,6 +20,7 @@ const theme = {
 import LoginScreen    from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import TasksScreen    from './screens/Tasks.Screen';
+import AccountScreen  from './screens/AccountScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +33,7 @@ export default function App() {
             <Stack.Screen name="Login"    component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="Tasks"    component={TasksScreen} />
+            <Stack.Screen name="Account"  component={AccountScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

@@ -1,18 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { View as RNView, Image as RNImage, StyleSheet } from 'react-native';
+import {
+  View as RNView,
+  Image as RNImage,
+  StyleSheet,
+  ActivityIndicator as RNActivityIndicator,
+  Modal as RNModal,
+} from 'react-native';
 import { Text, TextInput as PaperInput, Button, Snackbar, Portal } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI } from '../services/api';
 
 // ── TypeScript 5.9 / RN compat casts ────────────────────────────────────────
-const View      = RNView   as unknown as React.FC<{ style?: any; children?: React.ReactNode }>;
-const Image     = RNImage  as unknown as React.FC<{ source: any; style?: any }>;
-const TextInput = PaperInput as any;
+const View              = RNView              as unknown as React.FC<{ style?: any; children?: React.ReactNode }>;
+const Image             = RNImage             as unknown as React.FC<{ source: any; style?: any }>;
+const TextInput         = PaperInput          as any;
+const ActivityIndicator = RNActivityIndicator as unknown as React.FC<{ size?: any; color?: string }>;
+const Modal             = RNModal             as unknown as React.FC<{ transparent?: boolean; animationType?: string; visible?: boolean; children?: React.ReactNode }>;
 // ────────────────────────────────────────────────────────────────────────────
 
 const GREEN      = '#00723F';
 const DARK_GREEN = '#024731';
 const GOLD       = '#DD971A';
+
+const ls = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', alignItems: 'center' },
+  box:     { backgroundColor: '#fff', borderRadius: 16, padding: 32, alignItems: 'center', gap: 14,
+             shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 10, elevation: 8 },
+  text:    { color: DARK_GREEN, fontSize: 15, fontWeight: '600' },
+});
 
 export default function LoginScreen({ navigation, route }: any) {
   const [email, setEmail]       = useState('test@uabc.mx');
@@ -48,6 +63,13 @@ export default function LoginScreen({ navigation, route }: any) {
       setLoading(true);
       const { data } = await authAPI.login(email.trim(), password);
       await AsyncStorage.setItem('token', data.token);
+      await AsyncStorage.setItem('userEmail', email.trim());
+      // restaurar avatar desde la BD para que aparezca de inmediato en Tasks
+      try {
+        const me = await authAPI.getMe();
+        if (me.data.avatar) await AsyncStorage.setItem('userPhoto', me.data.avatar);
+        else await AsyncStorage.removeItem('userPhoto');
+      } catch { /* no bloquear el login si falla */ }
       navigation.replace('Tasks');
     } catch (e: any) {
       setSnack({ message: e.response?.data?.error ?? 'Error de conexión', visible: true });
@@ -56,6 +78,16 @@ export default function LoginScreen({ navigation, route }: any) {
 
   return (
     <View style={s.container}>
+      {/* Full-screen loader al iniciar sesión */}
+      <Modal transparent animationType="fade" visible={loading}>
+        <View style={ls.overlay}>
+          <View style={ls.box}>
+            <ActivityIndicator size="large" color={GREEN} />
+            <Text style={ls.text}>Iniciando sesión...</Text>
+          </View>
+        </View>
+      </Modal>
+
       {/* Logo */}
       <View style={s.logoBox}>
         <View style={s.logoUabcRow}>
