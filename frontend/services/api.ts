@@ -22,6 +22,16 @@ export const authAPI = {
     api.post<{ id: number; email: string }>('/auth/register', { email, password: pass }),
   login: (email: string, pass: string) =>
     api.post<{ token: string }>('/auth/login', { email, password: pass }),
+  getMe: () =>
+    api.get<{ id: number; email: string; avatar: string | null }>('/auth/me'),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.put('/auth/password', { currentPassword, newPassword }),
+  changeEmail: (newEmail: string, password: string) =>
+    api.put<{ ok: boolean; email: string }>('/auth/email', { newEmail, password }),
+  updateAvatar: (avatar: string) =>
+    api.put('/auth/avatar', { avatar }, { timeout: 30000 }),
+  deleteAccount: (password: string) =>
+    api.delete('/auth/account', { data: { password } }),
 };
 
 export const tasksAPI = {
@@ -30,8 +40,8 @@ export const tasksAPI = {
     api.post('/tasks', { titulo }),
   toggle: (id: number, completada: boolean) =>
     api.put(`/tasks/${id}`, { completada }),
-  edit: (id: number, titulo: string) =>
-    api.put(`/tasks/${id}`, { titulo }),
+  edit: (id: number, titulo: string, prioridad: string | null, tiempoLimite: number | null) =>
+    api.put(`/tasks/${id}`, { titulo, prioridad, tiempo_limite: tiempoLimite }),
   remove: (id: number) =>
     api.delete(`/tasks/${id}`),
 };

@@ -49,8 +49,13 @@ Aplicación móvil full-stack para gestión de tareas, construida con React Nati
 | Gestión de tareas | Crear, leer, actualizar y eliminar tareas |
 | Completar tarea | Marcar tareas como pendientes o completadas |
 | Reordenar tareas | Mantén presionado el ícono `≡` y arrastra para reordenar |
+| Pantalla de cuenta | Avatar con foto de perfil (galería) o iniciales, muestra el correo registrado |
+| Cambio de foto | Selección desde la galería del dispositivo, recorte cuadrado |
+| Cambio de correo | Modal con validación de formato, unicidad y contraseña actual |
+| Cambio de contraseña | Modal con verificación de contraseña actual, mínimo 6 caracteres y confirmación |
+| Pantallas de carga | Loader al inicio, al hacer logout, al agregar y al eliminar tareas |
 | Notificaciones toast | Feedback visual en cada acción del usuario |
-| Sesión persistente | Token almacenado con AsyncStorage |
+| Sesión persistente | Token y correo almacenados con AsyncStorage |
 
 ---
 
@@ -68,7 +73,7 @@ taskmate/
 │       ├── index.ts                # Punto de entrada Express (puerto 3000)
 │       ├── db.ts                   # Conexión a PostgreSQL e inicialización del esquema
 │       ├── controllers/
-│       │   ├── auth.controller.ts  # Lógica de registro e inicio de sesión
+│       │   ├── auth.controller.ts  # Registro, login, getMe y cambio de contraseña
 │       │   └── tasks.controller.ts # Operaciones CRUD de tareas
 │       ├── routes/
 │       │   ├── auth.routes.ts
@@ -82,7 +87,9 @@ taskmate/
     ├── index.ts                    # Punto de entrada de la app
     ├── screens/
     │   ├── LoginScreen.tsx
-    │   └── Tasks.Screen.tsx
+    │   ├── RegisterScreen.tsx
+    │   ├── Tasks.Screen.tsx        # Pantalla principal con drag-and-drop y loaders
+    │   └── AccountScreen.tsx       # Pantalla de cuenta: avatar, email y cambio de contraseña
     ├── components/
     │   └── Toast.tsx               # Notificación toast animada
     └── services/
@@ -169,23 +176,26 @@ npm run dev
 
 ## Referencia de la API
 
-Todos los endpoints de tareas requieren el header `Authorization: Bearer <token>`.
+Todos los endpoints marcados con 🔒 requieren el header `Authorization: Bearer <token>`.
 
 ### Autenticación
 
-| Método | Endpoint | Body | Descripción |
-|---|---|---|---|
-| `POST` | `/api/auth/register` | `{ email, password }` | Crea una nueva cuenta |
-| `POST` | `/api/auth/login` | `{ email, password }` | Retorna un token JWT |
+| Método | Endpoint | Auth | Body | Descripción |
+|---|---|---|---|---|
+| `POST` | `/api/auth/register` | — | `{ email, password }` | Crea una nueva cuenta |
+| `POST` | `/api/auth/login` | — | `{ email, password }` | Retorna un token JWT |
+| `GET` | `/api/auth/me` | 🔒 | — | Retorna el `id` y `email` del usuario autenticado |
+| `PUT` | `/api/auth/password` | 🔒 | `{ currentPassword, newPassword }` | Cambia la contraseña verificando la actual |
+| `PUT` | `/api/auth/email` | 🔒 | `{ newEmail, password }` | Cambia el correo verificando contraseña y unicidad |
 
 ### Tareas
 
-| Método | Endpoint | Body | Descripción |
-|---|---|---|---|
-| `GET` | `/api/tasks` | — | Obtiene todas las tareas del usuario autenticado |
-| `POST` | `/api/tasks` | `{ titulo }` | Crea una nueva tarea |
-| `PUT` | `/api/tasks/:id` | `{ completada?, titulo? }` | Actualiza el estado o título de una tarea |
-| `DELETE` | `/api/tasks/:id` | — | Elimina una tarea |
+| Método | Endpoint | Auth | Body | Descripción |
+|---|---|---|---|---|
+| `GET` | `/api/tasks` | 🔒 | — | Obtiene todas las tareas del usuario autenticado |
+| `POST` | `/api/tasks` | 🔒 | `{ titulo }` | Crea una nueva tarea |
+| `PUT` | `/api/tasks/:id` | 🔒 | `{ completada?, titulo? }` | Actualiza el estado o título de una tarea |
+| `DELETE` | `/api/tasks/:id` | 🔒 | — | Elimina una tarea |
 
 ---
 
