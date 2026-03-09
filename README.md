@@ -1,130 +1,116 @@
 # TaskMate
 
-A full-stack task management mobile application built with React Native (Expo) and Node.js. Users can register, log in, create tasks, mark them as complete, edit, delete, and reorder them via drag-and-drop.
+Aplicación móvil full-stack para gestión de tareas, construida con React Native y Node.js. Permite registrarse, iniciar sesión, crear tareas, marcarlas como completadas, editarlas, eliminarlas y reordenarlas con drag-and-drop.
 
 ---
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Getting Started](#getting-started)
-  - [1. Clone the repository](#1-clone-the-repository)
-  - [2. Run the backend](#2-run-the-backend)
-  - [3. Run the frontend](#3-run-the-frontend)
-- [Environment Variables](#environment-variables)
-- [API Reference](#api-reference)
-- [Frontend Dependencies](#frontend-dependencies)
-- [Backend Dependencies](#backend-dependencies)
-
----
-
-## Overview
-
-| Feature | Description |
-|---|---|
-| Authentication | JWT-based register & login |
-| Task management | Create, read, update, delete tasks |
-| Completion toggle | Mark tasks done / pending |
-| Drag-to-reorder | Long-press handle to reorder tasks |
-| Toast notifications | Feedback on every action |
-| Persistent session | Token stored with AsyncStorage |
-
----
-
-## Tech Stack
+## Tecnologías
 
 ### Frontend
-| Technology | Version |
-|---|---|
-| React Native | 0.83.2 |
-| Expo SDK | 55 |
-| TypeScript | ~5.8.0 |
-| React Navigation | 7.x |
-| Axios | 1.x |
-| React Native Reanimated | 4.2.1 |
-| React Native Gesture Handler | ~2.30.0 |
-| React Native Draggable FlatList | ^4.0.3 |
-| AsyncStorage | 2.2.0 |
+![React Native](https://img.shields.io/badge/React_Native-0.83.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Expo](https://img.shields.io/badge/Expo-SDK_55-000020?style=for-the-badge&logo=expo&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![React Navigation](https://img.shields.io/badge/React_Navigation-7.x-6B52AE?style=for-the-badge&logo=react&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-1.x-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
 
 ### Backend
-| Technology | Version |
-|---|---|
-| Node.js | 22 (Alpine) |
-| Express | 5.x |
-| TypeScript | 5.x |
-| PostgreSQL | 15 |
-| jsonwebtoken | 9.x |
-| bcryptjs | 3.x |
+![Node.js](https://img.shields.io/badge/Node.js-22-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-9.x-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 
-### Infrastructure
-| Technology | Purpose |
-|---|---|
-| Docker + Docker Compose | Containerized API + database |
-| PostgreSQL 15 | Relational database |
+### Infraestructura
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 ---
 
-## Project Structure
+## Tabla de contenidos
+
+- [Funcionalidades](#funcionalidades)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Requisitos previos](#requisitos-previos)
+- [Instalación y ejecución](#instalación-y-ejecución)
+  - [1. Clonar el repositorio](#1-clonar-el-repositorio)
+  - [2. Ejecutar el backend](#2-ejecutar-el-backend)
+  - [3. Ejecutar el frontend](#3-ejecutar-el-frontend)
+- [Variables de entorno](#variables-de-entorno)
+- [Referencia de la API](#referencia-de-la-api)
+- [Dependencias del frontend](#dependencias-del-frontend)
+- [Dependencias del backend](#dependencias-del-backend)
+
+---
+
+## Funcionalidades
+
+| Funcionalidad | Descripción |
+|---|---|
+| Autenticación | Registro e inicio de sesión con JWT |
+| Gestión de tareas | Crear, leer, actualizar y eliminar tareas |
+| Completar tarea | Marcar tareas como pendientes o completadas |
+| Reordenar tareas | Mantén presionado el ícono `≡` y arrastra para reordenar |
+| Notificaciones toast | Feedback visual en cada acción del usuario |
+| Sesión persistente | Token almacenado con AsyncStorage |
+
+---
+
+## Estructura del proyecto
 
 ```
 taskmate/
-├── docker-compose.yml              # Orchestrates API + PostgreSQL containers
+├── docker-compose.yml              # Orquesta los contenedores de API y PostgreSQL
 │
 ├── backend/
 │   ├── Dockerfile
 │   ├── package.json
 │   ├── tsconfig.json
 │   └── src/
-│       ├── index.ts                # Express entry point (port 3000)
-│       ├── db.ts                   # PostgreSQL connection & schema init
+│       ├── index.ts                # Punto de entrada Express (puerto 3000)
+│       ├── db.ts                   # Conexión a PostgreSQL e inicialización del esquema
 │       ├── controllers/
-│       │   ├── auth.controller.ts  # register / login logic
-│       │   └── tasks.controller.ts # CRUD operations
+│       │   ├── auth.controller.ts  # Lógica de registro e inicio de sesión
+│       │   └── tasks.controller.ts # Operaciones CRUD de tareas
 │       ├── routes/
 │       │   ├── auth.routes.ts
 │       │   └── tasks.routes.ts
 │       └── middleware/
-│           └── auth.middleware.ts  # JWT verification
+│           └── auth.middleware.ts  # Verificación de JWT
 │
 └── frontend/
-    ├── App.tsx                     # Root component, navigation & gesture setup
-    ├── app.json                    # Expo config
-    ├── index.ts                    # App entry point
+    ├── App.tsx                     # Componente raíz, navegación y gesture handler
+    ├── app.json                    # Configuración de Expo
+    ├── index.ts                    # Punto de entrada de la app
     ├── screens/
     │   ├── LoginScreen.tsx
     │   └── Tasks.Screen.tsx
     ├── components/
-    │   └── Toast.tsx               # Animated toast notification
+    │   └── Toast.tsx               # Notificación toast animada
     └── services/
-        └── api.ts                  # Axios instance + API methods
+        └── api.ts                  # Instancia de Axios y métodos de la API
 ```
 
 ---
 
-## Prerequisites
+## Requisitos previos
 
 - [Node.js](https://nodejs.org/) 18+
-- [Docker](https://www.docker.com/) & Docker Compose
-- [Expo CLI](https://docs.expo.dev/get-started/installation/) — `npm install -g expo-cli`
-- [Expo Go](https://expo.dev/client) app on your iOS or Android device
+- [Docker](https://www.docker.com/) y Docker Compose
+- [Expo Go](https://expo.dev/client) instalado en tu dispositivo iOS o Android
 
 ---
 
-## Getting Started
+## Instalación y ejecución
 
-### 1. Clone the repository
+### 1. Clonar el repositorio
 
 ```bash
-git clone <repository-url>
+git clone <url-del-repositorio>
 cd taskmate
 ```
 
-### 2. Run the backend
+### 2. Ejecutar el backend
 
-The backend runs fully containerized. A single command starts both the PostgreSQL database and the API server:
+El backend corre completamente en contenedores. Un solo comando levanta la base de datos PostgreSQL y el servidor API:
 
 ```bash
 docker compose up --build
@@ -133,11 +119,11 @@ docker compose up --build
 - **API** → `http://localhost:3000`
 - **PostgreSQL** → `localhost:5434`
 
-The database schema (users and tasks tables) is created automatically on first boot.
+El esquema de la base de datos (tablas `users` y `tasks`) se crea automáticamente al primer arranque.
 
-> **Note:** The `api` service waits for `postgres` to be ready via `depends_on`. If the API crashes on first start, run `docker compose up` again.
+> **Nota:** Si el servicio `api` falla en el primer arranque, ejecuta `docker compose up` nuevamente. Esto ocurre cuando el contenedor de PostgreSQL aún no está listo para aceptar conexiones.
 
-### 3. Run the frontend
+### 3. Ejecutar el frontend
 
 ```bash
 cd frontend
@@ -145,33 +131,33 @@ npm install
 npx expo start --clear
 ```
 
-Scan the QR code with **Expo Go** on your device.
+Escanea el código QR con **Expo Go** desde tu dispositivo.
 
-> **Android emulator:** The API base URL automatically resolves to `http://10.0.2.2:3000/api`.
-> **iOS simulator / physical device:** It resolves to `http://localhost:3000/api`.
-> If testing on a **physical device**, update the base URL in `frontend/services/api.ts` to your machine's local IP (e.g., `http://192.168.1.x:3000/api`).
+> **Emulador Android:** La URL base se resuelve automáticamente a `http://10.0.2.2:3000/api`.
+> **Simulador iOS / dispositivo físico:** Se resuelve a `http://localhost:3000/api`.
+> Si pruebas en un **dispositivo físico**, actualiza la URL base en `frontend/services/api.ts` con la IP local de tu máquina (ej. `http://192.168.1.x:3000/api`).
 
 ---
 
-## Environment Variables
+## Variables de entorno
 
-The backend reads the following variables, configured in `docker-compose.yml`:
+El backend lee las siguientes variables, configuradas en `docker-compose.yml`:
 
-| Variable | Default | Description |
+| Variable | Valor por defecto | Descripción |
 |---|---|---|
-| `DATABASE_URL` | `postgresql://taskuser:taskpass@postgres:5432/taskmate` | PostgreSQL connection string |
-| `JWT_SECRET` | `secreto_seguro_2026` | Secret key for signing JWT tokens |
+| `DATABASE_URL` | `postgresql://taskuser:taskpass@postgres:5432/taskmate` | Cadena de conexión a PostgreSQL |
+| `JWT_SECRET` | `secreto_seguro_2026` | Clave para firmar los tokens JWT |
 
-> **Production:** Change `JWT_SECRET` to a long, random string and never commit it to version control.
+> **Producción:** Cambia `JWT_SECRET` por una cadena larga y aleatoria. Nunca la subas al repositorio.
 
-To run the backend locally without Docker, create `backend/.env`:
+Para ejecutar el backend localmente sin Docker, crea el archivo `backend/.env`:
 
 ```env
 DATABASE_URL=postgresql://taskuser:taskpass@localhost:5434/taskmate
-JWT_SECRET=your_secret_here
+JWT_SECRET=tu_secreto_aqui
 ```
 
-Then:
+Luego:
 
 ```bash
 cd backend
@@ -181,29 +167,29 @@ npm run dev
 
 ---
 
-## API Reference
+## Referencia de la API
 
-All task endpoints require the `Authorization: Bearer <token>` header.
+Todos los endpoints de tareas requieren el header `Authorization: Bearer <token>`.
 
-### Auth
+### Autenticación
 
-| Method | Endpoint | Body | Description |
+| Método | Endpoint | Body | Descripción |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | `{ email, password }` | Create a new account |
-| `POST` | `/api/auth/login` | `{ email, password }` | Returns a JWT token |
+| `POST` | `/api/auth/register` | `{ email, password }` | Crea una nueva cuenta |
+| `POST` | `/api/auth/login` | `{ email, password }` | Retorna un token JWT |
 
-### Tasks
+### Tareas
 
-| Method | Endpoint | Body | Description |
+| Método | Endpoint | Body | Descripción |
 |---|---|---|---|
-| `GET` | `/api/tasks` | — | Get all tasks for the authenticated user |
-| `POST` | `/api/tasks` | `{ titulo }` | Create a new task |
-| `PUT` | `/api/tasks/:id` | `{ completada?, titulo? }` | Update task status or title |
-| `DELETE` | `/api/tasks/:id` | — | Delete a task |
+| `GET` | `/api/tasks` | — | Obtiene todas las tareas del usuario autenticado |
+| `POST` | `/api/tasks` | `{ titulo }` | Crea una nueva tarea |
+| `PUT` | `/api/tasks/:id` | `{ completada?, titulo? }` | Actualiza el estado o título de una tarea |
+| `DELETE` | `/api/tasks/:id` | — | Elimina una tarea |
 
 ---
 
-## Frontend Dependencies
+## Dependencias del frontend
 
 ```json
 "dependencies": {
@@ -229,7 +215,7 @@ All task endpoints require the `Authorization: Bearer <token>` header.
 
 ---
 
-## Backend Dependencies
+## Dependencias del backend
 
 ```json
 "dependencies": {
