@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity,
-         StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View as RNView, Image as RNImage, StyleSheet } from 'react-native';
+import { Text, TextInput as PaperInput, Button, Snackbar, Portal } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI } from '../services/api';
-import Toast from '../components/Toast';
+
+// ── TypeScript 5.9 / RN compat casts ────────────────────────────────────────
+const View      = RNView   as unknown as React.FC<{ style?: any; children?: React.ReactNode }>;
+const Image     = RNImage  as unknown as React.FC<{ source: any; style?: any }>;
+const TextInput = PaperInput as any;
+// ────────────────────────────────────────────────────────────────────────────
+
+const GREEN      = '#00723F';
+const DARK_GREEN = '#024731';
+const GOLD       = '#DD971A';
 
 export default function LoginScreen({ navigation, route }: any) {
   const [email, setEmail]       = useState('test@uabc.mx');
   const [password, setPassword] = useState('123456');
   const [loading, setLoading]   = useState(false);
   const [errors, setErrors]     = useState<{ email?: string; password?: string }>({});
-  const [toast, setToast]       = useState({ message: '', visible: false });
+  const [snack, setSnack]       = useState({ message: '', visible: false });
 
   useEffect(() => {
-    if (route.params?.loggedOut) {
-      setToast({ message: 'Sesión cerrada', visible: true });
-      const t = setTimeout(() => setToast(p => ({ ...p, visible: false })), 2300);
-      return () => clearTimeout(t);
-    }
+    if (route.params?.loggedOut)
+      setSnack({ message: 'Sesión cerrada exitosamente', visible: true });
   }, []);
 
   const validate = () => {
@@ -42,45 +48,101 @@ export default function LoginScreen({ navigation, route }: any) {
       await AsyncStorage.setItem('token', data.token);
       navigation.replace('Tasks');
     } catch (e: any) {
-      Alert.alert('Error', e.response?.data?.error ?? 'Error de conexión');
+      setSnack({ message: e.response?.data?.error ?? 'Error de conexión', visible: true });
     } finally { setLoading(false); }
   };
 
   return (
-    <View style={[s.container, { position: 'relative' }]}>
-      <Toast message={toast.message} visible={toast.visible} />
-      <Text style={s.logo}>TaskMate</Text>
-      <Text style={s.sub}>MGTIC · UABC · 2026</Text>
+    <View style={s.container}>
+      {/* Logo */}
+      <View style={s.logoBox}>
+        <View style={s.logoUabcRow}>
+          <Image source={require('../assets/logo-uabc.png')} style={s.logoUabc} />
+        </View>
+        <View style={s.goldBarTop} />
+        <Text variant="displaySmall" style={s.logo}>Cima Task</Text>
+        <Text variant="bodySmall" style={s.sub}>
+          FCA | MGTIC | UABC · 2026
+        </Text>
+      </View>
 
-      <TextInput style={[s.input, errors.email && s.inputError]}
-        placeholder="Email" placeholderTextColor="#475569"
-        value={email} onChangeText={t => { setEmail(t); setErrors(p => ({...p, email: undefined})); }}
-        keyboardType="email-address" autoCapitalize="none" />
-      {errors.email && <Text style={s.errorT}>{errors.email}</Text>}
+      {/* Form */}
+      <View style={s.card}>
+        <TextInput
+          label="Correo electrónico"
+          mode="outlined"
+          value={email}
+          onChangeText={(t: string) => { setEmail(t); setErrors(p => ({ ...p, email: undefined })); }}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          error={!!errors.email}
+          style={s.input}
+          outlineColor={GREEN}
+          activeOutlineColor={DARK_GREEN}
+          left={<PaperInput.Icon icon="email-outline" color={GREEN} />}
+        />
+        {errors.email && <Text style={s.errorT}>{errors.email}</Text>}
 
-      <TextInput style={[s.input, errors.password && s.inputError]}
-        placeholder="Contraseña" placeholderTextColor="#475569"
-        value={password} onChangeText={t => { setPassword(t); setErrors(p => ({...p, password: undefined})); }}
-        secureTextEntry />
-      {errors.password && <Text style={s.errorT}>{errors.password}</Text>}
+        <TextInput
+          label="Contraseña"
+          mode="outlined"
+          value={password}
+          onChangeText={(t: string) => { setPassword(t); setErrors(p => ({ ...p, password: undefined })); }}
+          secureTextEntry
+          error={!!errors.password}
+          style={s.input}
+          outlineColor={GREEN}
+          activeOutlineColor={DARK_GREEN}
+          left={<PaperInput.Icon icon="lock-outline" color={GREEN} />}
+        />
+        {errors.password && <Text style={s.errorT}>{errors.password}</Text>}
 
-      <TouchableOpacity style={[s.btn, loading && s.disabled]}
-        onPress={handleLogin} disabled={loading}>
-        {loading ? <ActivityIndicator color="#000"/>
-          : <Text style={s.btnT}>Iniciar Sesión</Text>}
-      </TouchableOpacity>
+        <Button
+          mode="contained"
+          onPress={handleLogin}
+          loading={loading}
+          disabled={loading}
+          style={s.btn}
+          contentStyle={s.btnContent}
+          labelStyle={s.btnLabel}
+          buttonColor={GREEN}
+        >
+          Iniciar Sesión
+        </Button>
+      </View>
+
+      <View style={s.goldBar} />
+
+      <Portal>
+        <Snackbar
+          visible={snack.visible}
+          onDismiss={() => setSnack(p => ({ ...p, visible: false }))}
+          duration={2500}
+          style={s.snack}
+        >
+          {snack.message}
+        </Snackbar>
+      </Portal>
     </View>
   );
 }
+
 const s = StyleSheet.create({
-  container:  { flex:1, backgroundColor:'#080c14', justifyContent:'center', padding:28 },
-  logo:       { fontSize:32, color:'#00d4ff', fontWeight:'bold', textAlign:'center', marginBottom:4 },
-  sub:        { fontSize:12, color:'#64748b', textAlign:'center', marginBottom:40 },
-  input:      { backgroundColor:'#111827', borderWidth:1, borderColor:'#1e2d45',
-                color:'#e2e8f0', borderRadius:10, padding:14, fontSize:15, marginBottom:4 },
-  inputError: { borderColor:'#ef4444' },
-  errorT:     { color:'#ef4444', fontSize:12, marginBottom:10, marginLeft:4 },
-  btn:        { backgroundColor:'#00d4ff', borderRadius:10, padding:16, alignItems:'center', marginTop:8 },
-  disabled:   { opacity: 0.6 },
-  btnT:       { color:'#000', fontWeight:'bold', fontSize:16 },
+  container: { flex: 1, backgroundColor: '#FFFFFF', justifyContent: 'center', padding: 28 },
+  logoBox:   { alignItems: 'center', marginBottom: 36 },
+  logoAccent:{ width: 60, height: 4, backgroundColor: GOLD, borderRadius: 2, marginBottom: 12 },
+  logo:      { color: DARK_GREEN, fontWeight: 'bold', textAlign: 'center' },
+  sub:       { color: '#666', textAlign: 'center', marginTop: 4, fontSize: 11 },
+  card:      { backgroundColor: '#F9FFF9', borderRadius: 16, padding: 20,
+               borderWidth: 1, borderColor: '#D0E8D8' },
+  input:     { marginBottom: 4, backgroundColor: '#FFFFFF' },
+  errorT:    { color: '#ef4444', fontSize: 12, marginBottom: 10, marginLeft: 4 },
+  btn:       { marginTop: 16, borderRadius: 10 },
+  btnContent:{ paddingVertical: 6 },
+  btnLabel:  { fontSize: 16, fontWeight: 'bold', letterSpacing: 0.5 },
+  logoUabcRow: { alignItems: 'center', marginTop: 28 },
+  logoUabc:    { width: 80, height: 80, resizeMode: 'contain' },
+  goldBarTop:  { width: 60, height: 3, backgroundColor: GOLD, borderRadius: 2, marginTop: 10, marginBottom: 10 },
+  goldBar:     { height: 3, backgroundColor: GOLD, borderRadius: 2, marginTop: 16, marginHorizontal: 40 },
+  snack:       { backgroundColor: DARK_GREEN },
 });
