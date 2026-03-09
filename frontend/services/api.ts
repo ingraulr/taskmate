@@ -40,8 +40,8 @@ export const tasksAPI = {
     api.post('/tasks', { titulo }),
   toggle: (id: number, completada: boolean) =>
     api.put(`/tasks/${id}`, { completada }),
-  edit: (id: number, titulo: string) =>
-    api.put(`/tasks/${id}`, { titulo }),
+  edit: (id: number, titulo: string, prioridad: string | null, tiempoLimite: number | null) =>
+    api.put(`/tasks/${id}`, { titulo, prioridad, tiempo_limite: tiempoLimite }),
   remove: (id: number) =>
     api.delete(`/tasks/${id}`),
 };
