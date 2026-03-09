@@ -28,10 +28,13 @@ export const createTask = async (req: Request, res: Response) => {
 
 export const updateTask = async (req: Request, res: Response) => {
   try {
-    const { completada } = req.body;
+    const { completada, titulo } = req.body;
     const { rows } = await pool.query(
-      'UPDATE tasks SET completada = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
-      [completada, req.params.id, (req as any).userId]
+      `UPDATE tasks SET
+        completada = COALESCE($1, completada),
+        titulo     = COALESCE($2, titulo)
+       WHERE id = $3 AND user_id = $4 RETURNING *`,
+      [completada ?? null, titulo ?? null, req.params.id, (req as any).userId]
     );
     if (!rows[0]) return res.status(404).json({ error: 'No encontrada' });
     res.json(rows[0]);
