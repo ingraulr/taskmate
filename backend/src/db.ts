@@ -12,6 +12,7 @@ export const initDB = async () => {
       id         SERIAL PRIMARY KEY,
       email      VARCHAR(200) UNIQUE NOT NULL,
       password   VARCHAR(200) NOT NULL,
+      avatar     TEXT,
       created_at TIMESTAMP DEFAULT NOW()
     );
     CREATE TABLE IF NOT EXISTS tasks (
@@ -22,6 +23,7 @@ export const initDB = async () => {
       completada BOOLEAN DEFAULT false,
       created_at TIMESTAMP DEFAULT NOW()
     );
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar TEXT;
   `);
   console.log('Base de datos lista');
 };

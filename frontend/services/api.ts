@@ -22,6 +22,16 @@ export const authAPI = {
     api.post<{ id: number; email: string }>('/auth/register', { email, password: pass }),
   login: (email: string, pass: string) =>
     api.post<{ token: string }>('/auth/login', { email, password: pass }),
+  getMe: () =>
+    api.get<{ id: number; email: string; avatar: string | null }>('/auth/me'),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.put('/auth/password', { currentPassword, newPassword }),
+  changeEmail: (newEmail: string, password: string) =>
+    api.put<{ ok: boolean; email: string }>('/auth/email', { newEmail, password }),
+  updateAvatar: (avatar: string) =>
+    api.put('/auth/avatar', { avatar }, { timeout: 30000 }),
+  deleteAccount: (password: string) =>
+    api.delete('/auth/account', { data: { password } }),
 };
 
 export const tasksAPI = {
