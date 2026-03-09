@@ -17,8 +17,9 @@ const theme = {
     outline:          '#00723F',
   },
 };
-import LoginScreen from './screens/LoginScreen';
-import TasksScreen from './screens/Tasks.Screen';
+import LoginScreen    from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
+import TasksScreen    from './screens/Tasks.Screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,8 +29,9 @@ export default function App() {
       <PaperProvider theme={theme}>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Tasks" component={TasksScreen} />
+            <Stack.Screen name="Login"    component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Tasks"    component={TasksScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
